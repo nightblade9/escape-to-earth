@@ -1,11 +1,11 @@
 # Escape To Earth
 
-Stealth rescue roguelite where you team up with others to escape to earth. Made with .NET Core and GoRogue.
+Stealth rescue roguelite where you team up with others to escape to earth. Made with .NET Core, SadConsole, and GoRogue.
 
 ## Design Goals
 - Deen: making du'a with specific names of Allah, which determine the (multiple) effects
 - Educational: isolation kills you. You have to rescue others and work together to get out
-- Gameplay: stealth (non-combat) RL
+- Gameplay: stealth (non-combat) roguelite; enemies with pattern walks; machinery, switches, puzzles, etc.
 
 ## Background and Setting
 - Sci-Fi. We're enslaved by a new Firawn in 2150, we want to escape this prison planet to get back to Earth.
