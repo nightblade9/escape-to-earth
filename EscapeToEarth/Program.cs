@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GoRogue.MapGeneration.Generators;
+using GoRogue.MapViews;
+using Microsoft.Xna.Framework;
 using SadConsole;
 using System;
 
@@ -37,20 +39,26 @@ namespace StarterProject
             // Hook the "after render" even though we're not using it.
             //SadConsole.Game.OnDraw = DrawFrame;
 
-            // Start the game.
+
+
+            // Start the game. Blocking call that terminates when the game ends.
             SadConsole.Game.Instance.Run();
 
             //
             // Code here will not run until the game has shut down.
             //
+            ShutDown();
+        }
 
+        private static void ShutDown()
+        {
             SadConsole.Game.Instance.Dispose();
         }
         
         private static void Init()
         {
             // Any setup
-            SadConsole.Game.Instance.Components.Add(new SadConsole.Game.FPSCounterComponent(SadConsole.Game.Instance));
+            //SadConsole.Game.Instance.Components.Add(new SadConsole.Game.FPSCounterComponent(SadConsole.Game.Instance));
 
             SadConsole.Game.Instance.Window.Title = ".NET Core 2.0 Test";
 
@@ -66,6 +74,17 @@ namespace StarterProject
 
             // Initialize the windows
             Global.CurrentScreen.Children.Add(thisConsole);
+
+            var map = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
+            CellularAutomataGenerator.Generate(map);
+
+            for (var y = 0; y < ScreenAndMapHeight; y++)
+            {
+                for (var x = 0; x < ScreenAndMapWidth; x++)
+                {
+                    thisConsole.SetGlyph(x, y, map[x, y] == false ? '#' : '.');
+                }
+            }
         }
 
         private static void Update(GameTime time)
