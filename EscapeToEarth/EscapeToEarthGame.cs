@@ -72,17 +72,29 @@ namespace EscapeToEarth {
         private void DrawMap()
         {
             // TODO: draw only what changed
+            this.DrawAllWallsAndFloors();
+            this.DrawCharacter(playerPosition.X, playerPosition.Y, '@', Color.White);
+        }
+
+        private void DrawAllWallsAndFloors()
+        {
             for (var y = 0; y < ScreenAndMapHeight; y++)
             {
                 for (var x = 0; x < ScreenAndMapWidth; x++)
                 {
-                    mainConsole.SetForeground(x, y, Color.DarkGray);
-                    mainConsole.SetGlyph(x, y, map[x, y] == false ? '#' : '.');
+                    this.DrawCharacter(x, y, map[x, y] == false ? '#' : '.', Color.DarkGray);
                 }
             }
+        }
 
-            mainConsole.SetForeground(playerPosition.X, playerPosition.Y, Color.White);
-            mainConsole.SetGlyph(playerPosition.X, playerPosition.Y, '@');
+        private void DrawCharacter(int x, int y, int character, Color? colour = null)
+        {
+            if (colour.HasValue)
+            {
+                mainConsole.SetForeground(x, y, colour.Value);
+            }
+
+            mainConsole.SetGlyph(x, y, character);
         }
     }
 }
