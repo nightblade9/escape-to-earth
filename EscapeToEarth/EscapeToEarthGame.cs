@@ -2,9 +2,12 @@ using GoRogue.MapGeneration.Generators;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
 using SadConsole;
+using System;
 
 namespace EscapeToEarth {
     class EscapeToEarthGame {
+        private readonly Color ReallyDarkGrey = new Color(96, 96, 96);
+
         // 960x540 pixels on an 8x16 font. Although the font claims to be 8x16, multiplying doesn't work out.
         // If you take a screenshot and measure, you'll see that these are the correct values; you end up with
         // a 961x544px screen.
@@ -16,8 +19,10 @@ namespace EscapeToEarth {
 
 
         private ArrayMap<bool> map;
-        // TODO: into player class?
+
+        // TODO: into player class
         GoRogue.Coord playerPosition;
+        const int PlayerFovRadius = 5;
 
         public EscapeToEarthGame()
         {
@@ -74,6 +79,7 @@ namespace EscapeToEarth {
             // TODO: draw only what changed
             this.DrawAllWallsAndFloors();
             this.DrawCharacter(playerPosition.X, playerPosition.Y, '@', Color.White);
+            this.LightenFov();
         }
 
         private void DrawAllWallsAndFloors()
@@ -82,7 +88,7 @@ namespace EscapeToEarth {
             {
                 for (var x = 0; x < ScreenAndMapWidth; x++)
                 {
-                    this.DrawCharacter(x, y, map[x, y] == false ? '#' : '.', Color.DarkGray);
+                    this.DrawCharacter(x, y, map[x, y] == false ? '#' : '.', ReallyDarkGrey);
                 }
             }
         }
@@ -95,6 +101,23 @@ namespace EscapeToEarth {
             }
 
             mainConsole.SetGlyph(x, y, character);
+        }
+
+        private void LightenFov()
+        {
+            // Assumption: previously-lit tiles are dark now
+            // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)
+            for (int y = playerPosition.Y - PlayerFovRadius; y < playerPosition.Y + PlayerFovRadius; y++)
+            {
+                for (int x = playerPosition.X - PlayerFovRadius; x < playerPosition.X + PlayerFovRadius; x++)
+                {
+                    if ((x >= 0 && x < ScreenAndMapWidth && y >= 0 && y < ScreenAndMapHeight) &&
+                    (Math.Pow(x - playerPosition.X, 2) + Math.Pow(y - playerPosition.Y, 2) <= 2 * PlayerFovRadius))
+                    {
+                        mainConsole.SetForeground(x, y, Color.DarkGray);
+                    }
+                }
+            }
         }
     }
 }
