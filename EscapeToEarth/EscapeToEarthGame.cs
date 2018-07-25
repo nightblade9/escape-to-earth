@@ -14,6 +14,11 @@ namespace EscapeToEarth {
 
         private SadConsole.Console mainConsole;
 
+
+        private ArrayMap<bool> map;
+        // TODO: into player class?
+        GoRogue.Coord playerPosition;
+
         public EscapeToEarthGame()
         {
             //SadConsole.Settings.UnlimitedFPS = true;
@@ -33,8 +38,6 @@ namespace EscapeToEarth {
             // Any setup
             //SadConsole.Game.Instance.Components.Add(new SadConsole.Game.FPSCounterComponent(SadConsole.Game.Instance));
 
-            SadConsole.Game.Instance.Window.Title = ".NET Core 2.0 Test";
-
             // By default SadConsole adds a blank ready-to-go console to the rendering system. 
             // We don't want to use that for the sample project so we'll remove it.
 
@@ -48,16 +51,12 @@ namespace EscapeToEarth {
             // Initialize the windows
             Global.CurrentScreen.Children.Add(mainConsole);
 
-            var map = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
+            this.map = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
             CellularAutomataGenerator.Generate(map);
+            // Randomly positioned on a ground tile!
+            this.playerPosition = map.RandomPosition(true);
 
-            for (var y = 0; y < ScreenAndMapHeight; y++)
-            {
-                for (var x = 0; x < ScreenAndMapWidth; x++)
-                {
-                    mainConsole.SetGlyph(x, y, map[x, y] == false ? '#' : '.');
-                }
-            }
+            this.DrawMap();
         }
 
         public void Update(GameTime time)
@@ -68,6 +67,22 @@ namespace EscapeToEarth {
         public void DrawFrame(GameTime time)
         {
 
+        }
+
+        private void DrawMap()
+        {
+            // TODO: draw only what changed
+            for (var y = 0; y < ScreenAndMapHeight; y++)
+            {
+                for (var x = 0; x < ScreenAndMapWidth; x++)
+                {
+                    mainConsole.SetForeground(x, y, Color.DarkGray);
+                    mainConsole.SetGlyph(x, y, map[x, y] == false ? '#' : '.');
+                }
+            }
+
+            mainConsole.SetForeground(playerPosition.X, playerPosition.Y, Color.White);
+            mainConsole.SetGlyph(playerPosition.X, playerPosition.Y, '@');
         }
     }
 }

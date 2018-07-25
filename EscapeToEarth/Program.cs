@@ -12,6 +12,8 @@ namespace StarterProject
         {
             var g = new EscapeToEarthGame();
 
+            SadConsole.Game.Instance.Window.Title = ".NET Core 2.0 Test";
+
             // Hook the start event so we can add consoles to the system.
             SadConsole.Game.OnInitialize = g.Init;
 
