@@ -101,6 +101,11 @@ namespace EscapeToEarth {
                 this.playerPosition = this.playerPosition.Translate(dx, dy);
                 this.redrawScreen = true;
             }
+
+            if (keysDown.Contains(AsciiKey.Get(Keys.Escape)))
+            {
+                System.Environment.Exit(0);
+            }
         }
 
         public void DrawFrame(GameTime time)
