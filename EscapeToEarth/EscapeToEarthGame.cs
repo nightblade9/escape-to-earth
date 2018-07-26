@@ -40,7 +40,8 @@ namespace EscapeToEarth {
             //SadConsole.Engine.Initialize("IBM.font", 80, 25, (g) => { g.GraphicsDeviceManager.HardwareModeSwitch = false; g.Window.AllowUserResizing = true; });
 
             SadConsole.Game.Create($"Fonts/{FontName}", ScreenAndMapWidth, ScreenAndMapHeight);
-
+            // Make click-hold a bit snappier; the time between first pressing, and then repeating, should be short.
+            SadConsole.Global.KeyboardState.InitialRepeatDelay = 0.4f; // default of 0.8s was too slow
         }
 
         public void Init()
@@ -71,7 +72,7 @@ namespace EscapeToEarth {
 
         public void Update(GameTime time)
         {
-            var keysDown = SadConsole.Global.KeyboardState.KeysDown;
+            var keysDown = SadConsole.Global.KeyboardState.KeysPressed;
 
             var dx = 0;
             var dy = 0;
