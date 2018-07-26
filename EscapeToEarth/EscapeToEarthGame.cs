@@ -7,6 +7,7 @@ using SadConsole;
 using SadConsole.Input;
 using Microsoft.Xna.Framework.Input;
 
+using EscapeToEarth.Entities;
 using System;
 
 namespace EscapeToEarth {
@@ -25,9 +26,7 @@ namespace EscapeToEarth {
 
         private ArrayMap<bool> map;
 
-        // TODO: into player class
-        private GoRogue.Coord playerPosition;
-        private const int PlayerFovRadius = 5;
+        private Player player = new Player();
 
         public EscapeToEarthGame()
         {
@@ -65,7 +64,7 @@ namespace EscapeToEarth {
             this.map = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
             CellularAutomataGenerator.Generate(map);
             // Randomly positioned on a ground tile!
-            this.playerPosition = map.RandomPosition(true);
+            player.Position = map.RandomPosition(true);
 
             this.DrawMap();
         }
@@ -95,10 +94,9 @@ namespace EscapeToEarth {
                 dy = 1;
             }
 
-            // Premature optimization is the root of much evil!
             if (dx != 0 || dy != 0)
             {
-                this.playerPosition = this.playerPosition.Translate(dx, dy);
+                this.player.Position = this.player.Position.Translate(dx, dy);
                 this.redrawScreen = true;
             }
 
@@ -119,7 +117,7 @@ namespace EscapeToEarth {
             if (this.redrawScreen)
             {
                 this.DrawAllWallsAndFloors();
-                this.DrawCharacter(playerPosition.X, playerPosition.Y, '@', Color.White);
+                this.DrawCharacter(player.Position.X, player.Position.Y, '@', Color.White);
                 this.LightenFov();
 
                 this.redrawScreen = false;
@@ -151,12 +149,12 @@ namespace EscapeToEarth {
         {
             // Assumption: previously-lit tiles are dark now
             // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)
-            for (int y = playerPosition.Y - PlayerFovRadius; y < playerPosition.Y + PlayerFovRadius; y++)
+            for (int y = player.Position.Y - Player.FovRadius; y < player.Position.Y + Player.FovRadius; y++)
             {
-                for (int x = playerPosition.X - PlayerFovRadius; x < playerPosition.X + PlayerFovRadius; x++)
+                for (int x = player.Position.X - Player.FovRadius; x < player.Position.X + Player.FovRadius; x++)
                 {
                     if ((x >= 0 && x < ScreenAndMapWidth && y >= 0 && y < ScreenAndMapHeight) &&
-                    (Math.Pow(x - playerPosition.X, 2) + Math.Pow(y - playerPosition.Y, 2) <= 2 * PlayerFovRadius))
+                    (Math.Pow(x - player.Position.X, 2) + Math.Pow(y - player.Position.Y, 2) <= 2 * Player.FovRadius))
                     {
                         mainConsole.SetForeground(x, y, Color.DarkGray);
                     }
