@@ -137,7 +137,11 @@ namespace EscapeToEarth {
             {
                 for (var x = 0; x < ScreenAndMapWidth; x++)
                 {
-                    this.DrawCharacter(x, y, map[x, y].IsWalkable == false ? '#' : '.', ReallyDarkGrey);
+                    // Draw even if black; because FOV just lightens.
+                    // If we don't draw black tiles, we need FOV to draw it, and we need to mark all
+                    // the FOV tiles as discovered before we draw here.
+                    var colour = this.map[x, y].IsDiscovered ? this.ReallyDarkGrey : Color.Black;
+                    this.DrawCharacter(x, y, map[x, y].IsWalkable == false ? '#' : '.', colour);
                 }
             }
         }
@@ -163,6 +167,7 @@ namespace EscapeToEarth {
                     if ((x >= 0 && x < ScreenAndMapWidth && y >= 0 && y < ScreenAndMapHeight) &&
                     (Math.Pow(x - player.Position.X, 2) + Math.Pow(y - player.Position.Y, 2) <= 2 * Player.FovRadius))
                     {
+                        this.map[x, y].IsDiscovered = true;
                         mainConsole.SetForeground(x, y, Color.DarkGray);
                     }
                 }
