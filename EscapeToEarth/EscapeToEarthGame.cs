@@ -24,7 +24,7 @@ namespace EscapeToEarth {
         private SadConsole.Console mainConsole;
         private bool redrawScreen = true;
 
-        private ArrayMap<bool> map;
+        private ArrayMap<MapTile> map;
 
         private Player player = new Player();
 
@@ -61,10 +61,17 @@ namespace EscapeToEarth {
             // Initialize the windows
             Global.CurrentScreen.Children.Add(mainConsole);
 
-            this.map = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
-            CellularAutomataGenerator.Generate(map);
-            // Randomly positioned on a ground tile!
-            player.Position = map.RandomPosition(true);
+            var isWalkableMap = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
+            CellularAutomataGenerator.Generate(isWalkableMap);
+            // Randomly positioned on a ground tile! True = walkable
+            player.Position = isWalkableMap.RandomPosition(true);
+
+            this.map = new ArrayMap<MapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
+            foreach (var tile in isWalkableMap.Positions())
+            {
+                // Convert from boolean (true/false) to tiles
+                this.map[tile.X, tile.Y] = new MapTile() { IsWalkable = isWalkableMap[tile.X, tile.Y] };
+            }
 
             this.DrawMap();
         }
@@ -130,7 +137,7 @@ namespace EscapeToEarth {
             {
                 for (var x = 0; x < ScreenAndMapWidth; x++)
                 {
-                    this.DrawCharacter(x, y, map[x, y] == false ? '#' : '.', ReallyDarkGrey);
+                    this.DrawCharacter(x, y, map[x, y].IsWalkable == false ? '#' : '.', ReallyDarkGrey);
                 }
             }
         }
