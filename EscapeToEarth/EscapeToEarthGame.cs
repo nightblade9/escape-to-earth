@@ -2,6 +2,11 @@ using GoRogue.MapGeneration.Generators;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
 using SadConsole;
+
+// for keyboard input
+using SadConsole.Input;
+using Microsoft.Xna.Framework.Input;
+
 using System;
 
 namespace EscapeToEarth {
@@ -16,13 +21,13 @@ namespace EscapeToEarth {
         private const int ScreenAndMapHeight = 34;
 
         private SadConsole.Console mainConsole;
-
+        private bool redrawScreen = true;
 
         private ArrayMap<bool> map;
 
         // TODO: into player class
-        GoRogue.Coord playerPosition;
-        const int PlayerFovRadius = 5;
+        private GoRogue.Coord playerPosition;
+        private const int PlayerFovRadius = 5;
 
         public EscapeToEarthGame()
         {
@@ -66,20 +71,53 @@ namespace EscapeToEarth {
 
         public void Update(GameTime time)
         {
+            var keysDown = SadConsole.Global.KeyboardState.KeysDown;
 
+            var dx = 0;
+            var dy = 0;
+
+            if (keysDown.Contains(AsciiKey.Get(Keys.Left)))
+            {
+                dx = -1;
+            }
+            else if (keysDown.Contains(AsciiKey.Get(Keys.Right)))
+            {
+                dx = 1;
+            }
+
+            if (keysDown.Contains(AsciiKey.Get(Keys.Up)))
+            {
+                dy = -1;
+            }
+            else if (keysDown.Contains(AsciiKey.Get(Keys.Down)))
+            {
+                dy = 1;
+            }
+
+            // Premature optimization is the root of much evil!
+            if (dx != 0 || dy != 0)
+            {
+                this.playerPosition = this.playerPosition.Translate(dx, dy);
+                this.redrawScreen = true;
+            }
         }
 
         public void DrawFrame(GameTime time)
         {
-
+            this.DrawMap();
         }
 
         private void DrawMap()
         {
             // TODO: draw only what changed
-            this.DrawAllWallsAndFloors();
-            this.DrawCharacter(playerPosition.X, playerPosition.Y, '@', Color.White);
-            this.LightenFov();
+            if (this.redrawScreen)
+            {
+                this.DrawAllWallsAndFloors();
+                this.DrawCharacter(playerPosition.X, playerPosition.Y, '@', Color.White);
+                this.LightenFov();
+
+                this.redrawScreen = false;
+            }
         }
 
         private void DrawAllWallsAndFloors()
