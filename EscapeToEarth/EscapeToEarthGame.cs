@@ -65,7 +65,9 @@ namespace EscapeToEarth {
             var isWalkableMap = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
             CellularAutomataGenerator.Generate(isWalkableMap);
             // Randomly positioned on a ground tile! True = walkable
-            player.Position.UpdateTo(isWalkableMap.RandomPosition(true));
+            var playerPosition = isWalkableMap.RandomPosition(true);
+            player.Position.X = playerPosition.X;
+            player.Position.Y = playerPosition.Y;
 
             this.map = new ArrayMap<MapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
             foreach (var tile in isWalkableMap.Positions())

@@ -9,7 +9,7 @@ namespace EscapeToEarth.Ecs.Components
     /// Moves an entity's X/Y coordinates by one (discretely) if the user pressed arrow keys.
     // TODO: WASD support
     /// </summary>
-    class MoveToKeyboardComponent : BaseComponent
+    public class MoveToKeyboardComponent : BaseComponent
     {
         public MoveToKeyboardComponent(Entity parent) : base(parent)
         {

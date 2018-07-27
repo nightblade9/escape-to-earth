@@ -31,5 +31,13 @@ namespace EscapeToEarth.UnitTest.Ecs
             var actual = e.Get<StringComponent>();
             Assert.That(actual, Is.EqualTo(expected));
         }
+
+        [Test]
+        public void EntityPositionDefaultsToZeroCoordinates()
+        {
+            var e = new Entity();
+            Assert.That(e.Position.X, Is.EqualTo(0));
+            Assert.That(e.Position.Y, Is.EqualTo(0));
+        }
     }
 }
