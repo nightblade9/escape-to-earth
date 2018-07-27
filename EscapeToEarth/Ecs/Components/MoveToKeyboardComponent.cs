@@ -21,20 +21,20 @@ namespace EscapeToEarth.Ecs.Components
             var dx = 0;
             var dy = 0;
 
-            if (keysDown.Contains(AsciiKey.Get(Keys.Left)))
+            if (keysDown.Contains(AsciiKey.Get(Keys.Left)) || keysDown.Contains(AsciiKey.Get(Keys.A)))
             {
                 dx = -1;
             }
-            else if (keysDown.Contains(AsciiKey.Get(Keys.Right)))
+            else if (keysDown.Contains(AsciiKey.Get(Keys.Right)) || keysDown.Contains(AsciiKey.Get(Keys.D)))
             {
                 dx = 1;
             }
 
-            if (keysDown.Contains(AsciiKey.Get(Keys.Up)))
+            if (keysDown.Contains(AsciiKey.Get(Keys.Up)) || keysDown.Contains(AsciiKey.Get(Keys.W)))
             {
                 dy = -1;
             }
-            else if (keysDown.Contains(AsciiKey.Get(Keys.Down)))
+            else if (keysDown.Contains(AsciiKey.Get(Keys.Down)) || keysDown.Contains(AsciiKey.Get(Keys.S)))
             {
                 dy = 1;
             }
