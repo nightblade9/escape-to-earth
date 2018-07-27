@@ -13,7 +13,7 @@ namespace EscapeToEarth.UnitTest.Ecs
             var expected = "Expected Value!";
 
             var e = new Entity();
-            e.Set<String>(expected);
+            e.Set(expected);
             var actual = e.Get<String>();
             Assert.That(actual, Is.EqualTo(expected));
         }
@@ -24,8 +24,8 @@ namespace EscapeToEarth.UnitTest.Ecs
             var expected = "Hello, world!";
 
             var e = new Entity();
-            e.Set<String>("wrong value");
-            e.Set<String>(expected);
+            e.Set("wrong value");
+            e.Set(expected);
 
             var actual = e.Get<String>();
             Assert.That(actual, Is.EqualTo(expected));

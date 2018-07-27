@@ -1,3 +1,4 @@
+using EscapeToEarth.Ecs.Components;
 using System.Collections.Generic;
 using System.Linq;
 using System;
@@ -6,7 +7,13 @@ namespace EscapeToEarth.Ecs
 {
     public class Entity
     {
+        public PositionComponent Position { get; } = new PositionComponent();
+
         private Dictionary<Type, Object> components = new Dictionary<Type, Object>();
+
+        public Entity()
+        {
+        }
 
         /// <summary>
         /// Given a type T, return the first component of that type. If you want multiple components, use GetAll<T>.
@@ -24,10 +31,10 @@ namespace EscapeToEarth.Ecs
             }
         }
 
-        public void Set<T>(Object value) where T : class
+        public void Set(Object component)
         {
-            var type = typeof(T);
-            this.components[type] = value;
+            var type = component.GetType();
+            this.components[type] = component;
         }
     }
 }
