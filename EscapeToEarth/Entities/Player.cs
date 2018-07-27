@@ -1,3 +1,4 @@
+using EscapeToEarth.Ecs.Components;
 using EscapeToEarth.Ecs;
 
 namespace EscapeToEarth.Entities
@@ -6,6 +7,10 @@ namespace EscapeToEarth.Entities
     {
         // How many tiles we see around us. 5 means five tiles radius.
         internal const int FovRadius = 5;
-        // TODO: move into base entitiy class
+
+        public Player()
+        {
+            this.Set(new MoveToKeyboardComponent(this));
+        }
     }
 }

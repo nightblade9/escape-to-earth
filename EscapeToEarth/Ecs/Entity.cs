@@ -7,12 +7,13 @@ namespace EscapeToEarth.Ecs
 {
     public class Entity
     {
-        public PositionComponent Position { get; } = new PositionComponent();
+        public PositionComponent Position { get; }
 
         private Dictionary<Type, Object> components = new Dictionary<Type, Object>();
 
         public Entity()
         {
+            this.Position = new PositionComponent(this);
         }
 
         /// <summary>

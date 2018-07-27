@@ -1,3 +1,4 @@
+using EscapeToEarth.Ecs.Components;
 using GoRogue.MapGeneration.Generators;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
@@ -80,31 +81,13 @@ namespace EscapeToEarth {
         {
             var keysDown = SadConsole.Global.KeyboardState.KeysPressed;
 
-            var dx = 0;
-            var dy = 0;
+            // TODO: for other things, we need a system processing and delegating to relevant entities
+            // TODO: container with systems/entities probably makes sense
+            var oldPosition = new PositionComponent(player) { X = player.Position.X, Y = player.Position.Y };
+            player.Get<MoveToKeyboardComponent>().Update(keysDown);
 
-            if (keysDown.Contains(AsciiKey.Get(Keys.Left)))
+            if (oldPosition.X != player.Position.X || oldPosition.Y != player.Position.Y)
             {
-                dx = -1;
-            }
-            else if (keysDown.Contains(AsciiKey.Get(Keys.Right)))
-            {
-                dx = 1;
-            }
-
-            if (keysDown.Contains(AsciiKey.Get(Keys.Up)))
-            {
-                dy = -1;
-            }
-            else if (keysDown.Contains(AsciiKey.Get(Keys.Down)))
-            {
-                dy = 1;
-            }
-
-            if (dx != 0 || dy != 0)
-            {
-                this.player.Position.X += dx;
-                this.player.Position.Y += dy;
                 this.redrawScreen = true;
             }
 
