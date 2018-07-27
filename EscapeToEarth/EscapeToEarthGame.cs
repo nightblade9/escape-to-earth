@@ -12,7 +12,7 @@ using System;
 
 namespace EscapeToEarth {
     class EscapeToEarthGame {
-        private readonly Color ReallyDarkGrey = new Color(96, 96, 96);
+        private readonly Color Grey48 = new Color(48, 48, 48);
 
         // 960x540 pixels on an 8x16 font. Although the font claims to be 8x16, multiplying doesn't work out.
         // If you take a screenshot and measure, you'll see that these are the correct values; you end up with
@@ -125,8 +125,8 @@ namespace EscapeToEarth {
             if (this.redrawScreen)
             {
                 this.DrawAllWallsAndFloors();
-                this.DrawCharacter(player.Position.X, player.Position.Y, '@', Color.White);
                 this.LightenFov();
+                this.DrawCharacter(player.Position.X, player.Position.Y, '@', Color.White);
 
                 this.redrawScreen = false;
             }
@@ -141,7 +141,7 @@ namespace EscapeToEarth {
                     // Draw even if black; because FOV just lightens.
                     // If we don't draw black tiles, we need FOV to draw it, and we need to mark all
                     // the FOV tiles as discovered before we draw here.
-                    var colour = this.map[x, y].IsDiscovered ? this.ReallyDarkGrey : Color.Black;
+                    var colour = this.map[x, y].IsDiscovered ? this.Grey48 : Color.Black;
                     this.DrawCharacter(x, y, map[x, y].IsWalkable == false ? '#' : '.', colour);
                 }
             }
