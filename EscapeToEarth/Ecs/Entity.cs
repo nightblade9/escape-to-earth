@@ -9,7 +9,7 @@ namespace EscapeToEarth.Ecs
     {
         public PositionComponent Position { get; }
 
-        private Dictionary<Type, Object> components = new Dictionary<Type, Object>();
+        private Dictionary<Type, BaseComponent> components = new Dictionary<Type, BaseComponent>();
 
         public Entity()
         {
@@ -19,7 +19,7 @@ namespace EscapeToEarth.Ecs
         /// <summary>
         /// Given a type T, return the first component of that type. If you want multiple components, use GetAll<T>.
         /// </summary>
-        public T Get<T>() where T : class
+        public T Get<T>() where T : BaseComponent
         {
             var type = typeof(T);
             if (!this.components.ContainsKey(type))
@@ -32,7 +32,7 @@ namespace EscapeToEarth.Ecs
             }
         }
 
-        public void Set(Object component)
+        public void Set(BaseComponent component)
         {
             var type = component.GetType();
             this.components[type] = component;

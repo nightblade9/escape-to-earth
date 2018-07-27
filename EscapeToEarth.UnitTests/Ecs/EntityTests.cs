@@ -1,4 +1,5 @@
 using EscapeToEarth.Ecs;
+using EscapeToEarth.UnitTest.Helpers;
 using NUnit.Framework;
 using System;
 
@@ -10,24 +11,24 @@ namespace EscapeToEarth.UnitTest.Ecs
         [Test]
         public void GetGetsSetValue()
         {
-            var expected = "Expected Value!";
-
             var e = new Entity();
+            var expected = new StringComponent(e) { Value = "Abc" };
+
             e.Set(expected);
-            var actual = e.Get<String>();
+            var actual = e.Get<StringComponent>();
             Assert.That(actual, Is.EqualTo(expected));
         }
 
         [Test]
         public void SetOverridesPreviousValuePerType()
         {
-            var expected = "Hello, world!";
-
             var e = new Entity();
-            e.Set("wrong value");
+            var expected = new StringComponent(e) { Value = "correct" };
+
+            e.Set(new StringComponent(e) { Value = "FAIL!!! " });
             e.Set(expected);
 
-            var actual = e.Get<String>();
+            var actual = e.Get<StringComponent>();
             Assert.That(actual, Is.EqualTo(expected));
         }
     }
