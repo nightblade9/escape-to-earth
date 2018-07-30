@@ -88,6 +88,14 @@ namespace EscapeToEarth {
             var oldPosition = new PositionComponent(player) { X = player.Position.X, Y = player.Position.Y };
             player.Get<MoveToKeyboardComponent>().Update(keysDown);
 
+            // Glorious hack. TODO: query the map tile for this + list of blocking objects
+            // TODO: this shouldn't be here, it should be in some keyboard movement system
+            if (!this.map[player.Position.X, player.Position.Y].IsWalkable)
+            {
+                player.Position.X = oldPosition.X;
+                player.Position.Y = oldPosition.Y;
+            }
+
             if (oldPosition.X != player.Position.X || oldPosition.Y != player.Position.Y)
             {
                 this.redrawScreen = true;
