@@ -5,6 +5,6 @@ namespace EscapeToEarth.Ecs.Systems
     public interface ISystem
     {
         void Add(Entity e);
-        void Update(float elapsedSeconds);
+        void Update(double elapsedSeconds);
     }
 }

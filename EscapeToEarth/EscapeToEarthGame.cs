@@ -6,10 +6,6 @@ using GoRogue.MapGeneration.Generators;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
 using SadConsole;
-// for keyboard input
-using SadConsole.Input;
-using Microsoft.Xna.Framework.Input;
-// End keyboard input processing
 using System;
 
 namespace EscapeToEarth {
@@ -26,9 +22,6 @@ namespace EscapeToEarth {
         private SadConsole.Console mainConsole;
         private bool redrawScreen = true;
 
-        private ArrayMap<MapTile> map;
-
-        private Player player = new Player();
         private Container container = new Container();
 
         public EscapeToEarthGame()
@@ -69,46 +62,31 @@ namespace EscapeToEarth {
             var isWalkableMap = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
             CellularAutomataGenerator.Generate(isWalkableMap);
             // Randomly positioned on a ground tile! True = walkable
+            var player = Player.Instance;
             var playerPosition = isWalkableMap.RandomPosition(true);
             player.Position.X = playerPosition.X;
             player.Position.Y = playerPosition.Y;
 
-            this.map = new ArrayMap<MapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
+            var map = new ArrayMap<MapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
+            this.container.Get<MovementSystem>().Map = map;
+
             foreach (var tile in isWalkableMap.Positions())
             {
                 // Convert from boolean (true/false) to tiles
-                this.map[tile.X, tile.Y] = new MapTile() { IsWalkable = isWalkableMap[tile.X, tile.Y] };
+                map[tile.X, tile.Y] = new MapTile() { IsWalkable = isWalkableMap[tile.X, tile.Y] };
             }
+
+            EventBus.Instance.Register("Player moved", () => { this.redrawScreen = true; });
 
             this.DrawMap();
         }
 
         public void Update(GameTime time)
         {
+            var elapsedSeconds = time.ElapsedGameTime.TotalMilliseconds;
+            // Try to isolate our use of global variables and external dependencies to this class (or to DI with interfaces).
             var keysDown = SadConsole.Global.KeyboardState.KeysPressed;
-
-            // TODO: for other things, we need a system processing and delegating to relevant entities
-            // TODO: container with systems/entities probably makes sense
-            var oldPosition = new PositionComponent(player) { X = player.Position.X, Y = player.Position.Y };
-            player.Get<MoveToKeyboardComponent>().Update(keysDown);
-
-            // Glorious hack. TODO: query the map tile for this + list of blocking objects
-            // TODO: this shouldn't be here, it should be in some keyboard movement system
-            if (!this.map[player.Position.X, player.Position.Y].IsWalkable)
-            {
-                player.Position.X = oldPosition.X;
-                player.Position.Y = oldPosition.Y;
-            }
-
-            if (oldPosition.X != player.Position.X || oldPosition.Y != player.Position.Y)
-            {
-                this.redrawScreen = true;
-            }
-
-            if (keysDown.Contains(AsciiKey.Get(Keys.Escape)))
-            {
-                System.Environment.Exit(0);
-            }
+            this.container.Update(elapsedSeconds);
         }
 
         public void DrawFrame(GameTime time)
@@ -121,6 +99,8 @@ namespace EscapeToEarth {
             // TODO: draw only what changed
             if (this.redrawScreen)
             {
+                var player = Player.Instance;
+
                 this.DrawAllWallsAndFloors();
                 this.LightenFov();
                 this.DrawCharacter(player.Position.X, player.Position.Y, '@', Color.White);
@@ -131,6 +111,8 @@ namespace EscapeToEarth {
 
         private void DrawAllWallsAndFloors()
         {
+            var map = this.container.Get<MovementSystem>().Map;
+
             for (var y = 0; y < ScreenAndMapHeight; y++)
             {
                 for (var x = 0; x < ScreenAndMapWidth; x++)
@@ -138,7 +120,7 @@ namespace EscapeToEarth {
                     // Draw even if black; because FOV just lightens.
                     // If we don't draw black tiles, we need FOV to draw it, and we need to mark all
                     // the FOV tiles as discovered before we draw here.
-                    var colour = this.map[x, y].IsDiscovered ? this.Grey48 : Color.Black;
+                    var colour = map[x, y].IsDiscovered ? this.Grey48 : Color.Black;
                     this.DrawCharacter(x, y, map[x, y].IsWalkable == false ? '#' : '.', colour);
                 }
             }
@@ -156,6 +138,10 @@ namespace EscapeToEarth {
 
         private void LightenFov()
         {
+            var map = this.container.Get<MovementSystem>().Map;
+            // TODO: move player into container, mayhap.
+            var player = Player.Instance;
+
             // Assumption: previously-lit tiles are dark now
             // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)
             for (int y = player.Position.Y - Player.FovRadius; y < player.Position.Y + Player.FovRadius; y++)
@@ -165,7 +151,7 @@ namespace EscapeToEarth {
                     if ((x >= 0 && x < ScreenAndMapWidth && y >= 0 && y < ScreenAndMapHeight) &&
                     (Math.Pow(x - player.Position.X, 2) + Math.Pow(y - player.Position.Y, 2) <= 2 * Player.FovRadius))
                     {
-                        this.map[x, y].IsDiscovered = true;
+                        map[x, y].IsDiscovered = true;
                         mainConsole.SetForeground(x, y, Color.DarkGray);
                     }
                 }

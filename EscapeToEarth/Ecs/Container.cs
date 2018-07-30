@@ -15,7 +15,20 @@ namespace EscapeToEarth.Ecs
             this.systems.Add(system);
         }
 
-        public void Update(float elapsedSeconds)
+        public T Get<T>() where T : ISystem
+        {
+            foreach (var system in this.systems)
+            {
+                if (system is T)
+                {
+                    return (T)system;
+                }
+            }
+
+            return default(T);
+        }
+
+        public void Update(double elapsedSeconds)
         {
             foreach (var system in this.systems)
             {
