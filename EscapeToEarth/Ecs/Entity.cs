@@ -16,6 +16,11 @@ namespace EscapeToEarth.Ecs
             this.Position = new PositionComponent(this);
         }
 
+        public bool Has<T>() where T : BaseComponent
+        {
+            return this.Get<T>() != default(T);
+        }
+
         /// <summary>
         /// Given a type T, return the first component of that type. If you want multiple components, use GetAll<T>.
         /// </summary>

@@ -1,14 +1,15 @@
+using EscapeToEarth.Ecs;
 using EscapeToEarth.Ecs.Components;
+using EscapeToEarth.Ecs.Systems;
+using EscapeToEarth.Entities;
 using GoRogue.MapGeneration.Generators;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
 using SadConsole;
-
 // for keyboard input
 using SadConsole.Input;
 using Microsoft.Xna.Framework.Input;
-
-using EscapeToEarth.Entities;
+// End keyboard input processing
 using System;
 
 namespace EscapeToEarth {
@@ -28,6 +29,7 @@ namespace EscapeToEarth {
         private ArrayMap<MapTile> map;
 
         private Player player = new Player();
+        private Container container = new Container();
 
         public EscapeToEarthGame()
         {
@@ -42,6 +44,8 @@ namespace EscapeToEarth {
             SadConsole.Game.Create($"Fonts/{FontName}", ScreenAndMapWidth, ScreenAndMapHeight);
             // Make click-hold a bit snappier; the time between first pressing, and then repeating, should be short.
             SadConsole.Global.KeyboardState.InitialRepeatDelay = 0.4f; // default of 0.8s was too slow
+
+            this.AddCoreGameLoopSystems();
         }
 
         public void Init()
@@ -166,6 +170,11 @@ namespace EscapeToEarth {
                     }
                 }
             }
+        }
+
+        private void AddCoreGameLoopSystems()
+        {
+            this.container.Add(new MovementSystem());
         }
     }
 }

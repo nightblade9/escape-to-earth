@@ -13,7 +13,6 @@ namespace EscapeToEarth.Ecs.Components
     {
         public MoveToKeyboardComponent(Entity parent) : base(parent)
         {
-
         }
 
         public void Update(IList<AsciiKey> keysDown)
