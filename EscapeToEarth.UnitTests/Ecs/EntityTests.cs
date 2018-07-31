@@ -39,5 +39,15 @@ namespace EscapeToEarth.UnitTest.Ecs
             Assert.That(e.Position.X, Is.EqualTo(0));
             Assert.That(e.Position.Y, Is.EqualTo(0));
         }
+
+        [Test]
+        public void HasReturnsTrueIffEntityHasThatComponentType()
+        {
+            var e = new Entity();
+            Assert.That(e.Has<StringComponent>(), Is.False);
+
+            e.Set(new StringComponent(e) { Value = "hello, world!" });
+            Assert.That(e.Has<StringComponent>(), Is.True);
+        }
     }
 }

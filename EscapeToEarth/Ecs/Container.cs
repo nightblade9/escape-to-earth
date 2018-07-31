@@ -6,7 +6,7 @@ namespace EscapeToEarth.Ecs
     /// <summary>
     /// A container of systems, we operate on their entities.
     /// </summary>
-    class Container
+    public class Container
     {
         public List<ISystem> systems = new List<ISystem>();
 
