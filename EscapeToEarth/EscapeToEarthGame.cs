@@ -24,6 +24,7 @@ namespace EscapeToEarth {
 
         private Container container = new Container();
 
+        private ArrayMap<MapTile> map;
         private Player player = new Player();
 
         public EscapeToEarthGame()
@@ -70,8 +71,8 @@ namespace EscapeToEarth {
             player.Position.X = playerPosition.X;
             player.Position.Y = playerPosition.Y;
 
-            var map = new ArrayMap<MapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
-            this.container.GetSystem<MovementSystem>().Map = map;
+            map = new ArrayMap<MapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
+            EventBus.Instance.Broadcast("Map changed", map);
 
             foreach (var tile in isWalkableMap.Positions())
             {
@@ -79,7 +80,7 @@ namespace EscapeToEarth {
                 map[tile.X, tile.Y] = new MapTile() { IsWalkable = isWalkableMap[tile.X, tile.Y] };
             }
 
-            EventBus.Instance.Register("Player moved", () => { this.redrawScreen = true; });
+            EventBus.Instance.Register("Player moved", (data) => { this.redrawScreen = true; });
 
             this.DrawMap();
         }
@@ -112,8 +113,6 @@ namespace EscapeToEarth {
 
         private void DrawAllWallsAndFloors()
         {
-            var map = this.container.GetSystem<MovementSystem>().Map;
-
             for (var y = 0; y < ScreenAndMapHeight; y++)
             {
                 for (var x = 0; x < ScreenAndMapWidth; x++)
@@ -139,9 +138,6 @@ namespace EscapeToEarth {
 
         private void LightenFov()
         {
-            var map = this.container.GetSystem<MovementSystem>().Map;
-            // TODO: move player into container, mayhap.
-
             // Assumption: previously-lit tiles are dark now
             // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)
             for (int y = player.Position.Y - Player.FovRadius; y < player.Position.Y + Player.FovRadius; y++)

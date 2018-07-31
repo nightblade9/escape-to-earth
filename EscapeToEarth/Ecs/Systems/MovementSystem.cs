@@ -10,9 +10,14 @@ namespace EscapeToEarth.Ecs.Systems
 {
     class MovementSystem : ISystem
     {
-        internal ArrayMap<MapTile> Map { get; set; }
+        private ArrayMap<MapTile> map;
         
         private Entity player;
+
+        public MovementSystem()
+        {
+            EventBus.Instance.Register("Map changed", (map) => this.map = map as ArrayMap<MapTile>);
+        }
 
         public void Add(Entity e)
         {
@@ -33,7 +38,7 @@ namespace EscapeToEarth.Ecs.Systems
             this.player.Get<MoveToKeyboardComponent>().Update(keysDown);
 
             // Glorious hack. TODO: query the map tile for this + list of blocking objects
-            if (!this.Map[this.player.Position.X, this.player.Position.Y].IsWalkable)
+            if (!this.map[this.player.Position.X, this.player.Position.Y].IsWalkable)
             {
                 this.player.Position.X = oldPlayerX;
                 this.player.Position.Y = oldPlayerY;
@@ -41,7 +46,7 @@ namespace EscapeToEarth.Ecs.Systems
 
             if (oldPlayerX != this.player.Position.X || oldPlayerY != this.player.Position.Y)
             {
-                EventBus.Instance.Broadcast("Player moved");
+                EventBus.Instance.Broadcast("Player moved", player);
             }
 
             if (keysDown.Contains(AsciiKey.Get(Keys.Escape)))
