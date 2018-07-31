@@ -24,6 +24,8 @@ namespace EscapeToEarth {
 
         private Container container = new Container();
 
+        private Player player = new Player();
+
         public EscapeToEarthGame()
         {
             //SadConsole.Settings.UnlimitedFPS = true;
@@ -39,9 +41,7 @@ namespace EscapeToEarth {
             SadConsole.Global.KeyboardState.InitialRepeatDelay = 0.4f; // default of 0.8s was too slow
 
             this.AddCoreGameLoopSystems();
-            
-            var player = new Player();
-            container.AddEntity(player);
+            this.container.AddEntity(this.player);
         }
 
         public void Init()
@@ -66,7 +66,6 @@ namespace EscapeToEarth {
             CellularAutomataGenerator.Generate(isWalkableMap);
 
             // Randomly positioned on a ground tile! True = walkable
-            var player = this.container.GetSystem<MovementSystem>().Player;
             var playerPosition = isWalkableMap.RandomPosition(true);
             player.Position.X = playerPosition.X;
             player.Position.Y = playerPosition.Y;
@@ -103,8 +102,6 @@ namespace EscapeToEarth {
             // TODO: draw only what changed
             if (this.redrawScreen)
             {
-                var player = container.GetSystem<MovementSystem>().Player;
-
                 this.DrawAllWallsAndFloors();
                 this.LightenFov();
                 this.DrawCharacter(player.Position.X, player.Position.Y, '@', Color.White);
@@ -144,7 +141,6 @@ namespace EscapeToEarth {
         {
             var map = this.container.GetSystem<MovementSystem>().Map;
             // TODO: move player into container, mayhap.
-            var player = this.container.GetSystem<MovementSystem>().Player;
 
             // Assumption: previously-lit tiles are dark now
             // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)

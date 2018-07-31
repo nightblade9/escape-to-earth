@@ -11,13 +11,14 @@ namespace EscapeToEarth.Ecs.Systems
     class MovementSystem : ISystem
     {
         internal ArrayMap<MapTile> Map { get; set; }
-        internal Entity Player { get; private set; }
+        
+        private Entity player;
 
         public void Add(Entity e)
         {
             if (e.Has<MoveToKeyboardComponent>())
             {
-                this.Player = e;
+                this.player = e;
             }
         }
 
@@ -26,19 +27,19 @@ namespace EscapeToEarth.Ecs.Systems
             // TODO: DI would be nice, but KeyboardState (Keyboard instance) isn't behind an interface
             var keysDown = SadConsole.Global.KeyboardState.KeysPressed;
 
-            var oldPlayerX = this.Player.Position.X;
-            var oldPlayerY = this.Player.Position.Y;
+            var oldPlayerX = this.player.Position.X;
+            var oldPlayerY = this.player.Position.Y;
 
-            this.Player.Get<MoveToKeyboardComponent>().Update(keysDown);
+            this.player.Get<MoveToKeyboardComponent>().Update(keysDown);
 
             // Glorious hack. TODO: query the map tile for this + list of blocking objects
-            if (!this.Map[this.Player.Position.X, this.Player.Position.Y].IsWalkable)
+            if (!this.Map[this.player.Position.X, this.player.Position.Y].IsWalkable)
             {
-                this.Player.Position.X = oldPlayerX;
-                this.Player.Position.Y = oldPlayerY;
+                this.player.Position.X = oldPlayerX;
+                this.player.Position.Y = oldPlayerY;
             }
 
-            if (oldPlayerX != this.Player.Position.X || oldPlayerY != this.Player.Position.Y)
+            if (oldPlayerX != this.player.Position.X || oldPlayerY != this.player.Position.Y)
             {
                 EventBus.Instance.Broadcast("Player moved");
             }
