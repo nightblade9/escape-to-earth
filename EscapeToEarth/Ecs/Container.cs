@@ -10,12 +10,12 @@ namespace EscapeToEarth.Ecs
     {
         public List<ISystem> systems = new List<ISystem>();
 
-        public void Add(ISystem system)
+        public void AddSystem(ISystem system)
         {
             this.systems.Add(system);
         }
 
-        public T Get<T>() where T : ISystem
+        public T GetSystem<T>() where T : ISystem
         {
             foreach (var system in this.systems)
             {
@@ -26,6 +26,14 @@ namespace EscapeToEarth.Ecs
             }
 
             return default(T);
+        }
+
+        public void AddEntity(Entity e)
+        {
+            foreach (var system in this.systems)
+            {
+                system.Add(e);
+            }
         }
 
         public void Update(double elapsedSeconds)

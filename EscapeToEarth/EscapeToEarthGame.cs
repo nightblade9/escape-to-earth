@@ -39,6 +39,9 @@ namespace EscapeToEarth {
             SadConsole.Global.KeyboardState.InitialRepeatDelay = 0.4f; // default of 0.8s was too slow
 
             this.AddCoreGameLoopSystems();
+            
+            var player = new Player();
+            container.AddEntity(player);
         }
 
         public void Init()
@@ -61,14 +64,15 @@ namespace EscapeToEarth {
 
             var isWalkableMap = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
             CellularAutomataGenerator.Generate(isWalkableMap);
+
             // Randomly positioned on a ground tile! True = walkable
-            var player = Player.Instance;
+            var player = this.container.GetSystem<MovementSystem>().Player;
             var playerPosition = isWalkableMap.RandomPosition(true);
             player.Position.X = playerPosition.X;
             player.Position.Y = playerPosition.Y;
 
             var map = new ArrayMap<MapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
-            this.container.Get<MovementSystem>().Map = map;
+            this.container.GetSystem<MovementSystem>().Map = map;
 
             foreach (var tile in isWalkableMap.Positions())
             {
@@ -99,7 +103,7 @@ namespace EscapeToEarth {
             // TODO: draw only what changed
             if (this.redrawScreen)
             {
-                var player = Player.Instance;
+                var player = container.GetSystem<MovementSystem>().Player;
 
                 this.DrawAllWallsAndFloors();
                 this.LightenFov();
@@ -111,7 +115,7 @@ namespace EscapeToEarth {
 
         private void DrawAllWallsAndFloors()
         {
-            var map = this.container.Get<MovementSystem>().Map;
+            var map = this.container.GetSystem<MovementSystem>().Map;
 
             for (var y = 0; y < ScreenAndMapHeight; y++)
             {
@@ -138,9 +142,9 @@ namespace EscapeToEarth {
 
         private void LightenFov()
         {
-            var map = this.container.Get<MovementSystem>().Map;
+            var map = this.container.GetSystem<MovementSystem>().Map;
             // TODO: move player into container, mayhap.
-            var player = Player.Instance;
+            var player = this.container.GetSystem<MovementSystem>().Player;
 
             // Assumption: previously-lit tiles are dark now
             // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)
@@ -160,7 +164,7 @@ namespace EscapeToEarth {
 
         private void AddCoreGameLoopSystems()
         {
-            this.container.Add(new MovementSystem());
+            this.container.AddSystem(new MovementSystem());
         }
     }
 }
