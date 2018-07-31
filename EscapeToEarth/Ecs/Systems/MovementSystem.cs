@@ -29,7 +29,6 @@ namespace EscapeToEarth.Ecs.Systems
 
         public void Update(double elapsedSeconds)
         {
-            // TODO: DI would be nice, but KeyboardState (Keyboard instance) isn't behind an interface
             var keysDown = SadConsole.Global.KeyboardState.KeysPressed;
 
             var oldPlayerX = this.player.Position.X;
