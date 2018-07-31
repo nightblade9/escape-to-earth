@@ -1,6 +1,6 @@
 namespace EscapeToEarth.Entities
 {
-    class MapTile
+    public class MapTile
     {
         public bool IsWalkable { get; set; } = false;
         // Used to implement "fog of war": undiscovered tiles don't show, discovered ones render dark when out of sight

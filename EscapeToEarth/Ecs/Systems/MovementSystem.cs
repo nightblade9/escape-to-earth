@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace EscapeToEarth.Ecs.Systems
 {
-    class MovementSystem : ISystem
+    public class MovementSystem : ISystem
     {
         private ArrayMap<MapTile> map;
         
