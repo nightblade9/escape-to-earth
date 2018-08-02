@@ -1,5 +1,6 @@
 using EscapeToEarth.Ecs.Components;
 using EscapeToEarth.Ecs;
+using Microsoft.Xna.Framework;
 
 namespace EscapeToEarth.Entities
 {
@@ -13,6 +14,7 @@ namespace EscapeToEarth.Entities
         public Player()
         {
             this.Set(new MoveToKeyboardComponent(this));
+            this.Set(new DisplayComponent(this, '@', Color.White));
         }
     }
 }

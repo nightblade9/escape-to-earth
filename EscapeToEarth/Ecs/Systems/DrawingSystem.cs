@@ -51,7 +51,8 @@ namespace EscapeToEarth.Ecs.Systems
             {
                 this.DrawAllWallsAndFloors();
                 this.LightenFov();
-                this.DrawCharacter(player.Position.X, player.Position.Y, '@', Color.White);
+                var playerDisplay = this.player.Get<DisplayComponent>();
+                this.DrawCharacter(player.Position.X, player.Position.Y, playerDisplay.Character, playerDisplay.Colour);
 
                 this.redrawScreen = false;
             }
