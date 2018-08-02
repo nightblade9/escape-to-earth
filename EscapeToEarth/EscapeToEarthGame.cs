@@ -156,7 +156,7 @@ namespace EscapeToEarth {
 
         private void AddCoreGameLoopSystems()
         {
-            this.container.AddSystem(new MovementSystem());
+            this.container.AddSystem(new MovementSystem(this.player));
         }
     }
 }

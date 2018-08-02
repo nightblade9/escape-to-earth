@@ -8,18 +8,16 @@ using System.Collections.Generic;
 
 namespace EscapeToEarth.Ecs.Systems
 {
-    public class MovementSystem : ISystem
+    public class MovementSystem : AbstractSystem
     {
         private ArrayMap<MapTile> map;
-        
-        private Entity player;
 
-        public MovementSystem()
+        public MovementSystem(Player player) : base(player)
         {
             EventBus.Instance.Register("Map changed", (map) => this.map = map as ArrayMap<MapTile>);
         }
 
-        public void Add(Entity e)
+        override public void Add(Entity e)
         {
             if (e.Has<MoveToKeyboardComponent>())
             {
@@ -27,7 +25,7 @@ namespace EscapeToEarth.Ecs.Systems
             }
         }
 
-        public void Update(double elapsedSeconds)
+        override public void Update(double elapsedSeconds)
         {
             var keysDown = SadConsole.Global.KeyboardState.KeysPressed;
 

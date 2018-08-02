@@ -3,7 +3,7 @@ using EscapeToEarth.Ecs;
 
 namespace EscapeToEarth.Entities
 {
-    class Player : Entity
+    public class Player : Entity
     {
         /// <summary>
         /// How many tiles we see around us. 5 means five tiles radius.
