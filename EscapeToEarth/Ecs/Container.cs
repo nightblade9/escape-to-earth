@@ -9,10 +9,15 @@ namespace EscapeToEarth.Ecs
     public class Container
     {
         public List<ISystem> systems = new List<ISystem>();
+        private DrawingSystem drawingSystem;
 
         public void AddSystem(ISystem system)
         {
             this.systems.Add(system);
+            if (system is DrawingSystem)
+            {
+                this.drawingSystem = system as DrawingSystem;
+            }
         }
 
         public T GetSystem<T>() where T : ISystem
@@ -41,6 +46,14 @@ namespace EscapeToEarth.Ecs
             foreach (var system in this.systems)
             {
                 system.Update(elapsedSeconds);
+            }
+        }
+
+        public void DrawFrame(double elapsedSeconds)
+        {
+            if (this.drawingSystem != null)
+            {
+                this.drawingSystem.Draw(elapsedSeconds);
             }
         }
     }

@@ -8,19 +8,18 @@ using Microsoft.Xna.Framework;
 using SadConsole;
 using System;
 
-namespace EscapeToEarth {
-    class EscapeToEarthGame {
-        private readonly Color Grey48 = new Color(48, 48, 48);
-
+namespace EscapeToEarth
+{
+    class EscapeToEarthGame
+    {
+        private const int ScreenAndMapWidth = 120;
+        private const int ScreenAndMapHeight = 34;
         // 960x540 pixels on an 8x16 font. Although the font claims to be 8x16, multiplying doesn't work out.
         // If you take a screenshot and measure, you'll see that these are the correct values; you end up with
         // a 961x544px screen.
         private const string FontName = "IBM.font";
-        private const int ScreenAndMapWidth = 120;
-        private const int ScreenAndMapHeight = 34;
-
+        
         private SadConsole.Console mainConsole;
-        private bool redrawScreen = true;
 
         private Container container = new Container();
 
@@ -39,10 +38,7 @@ namespace EscapeToEarth {
 
             SadConsole.Game.Create($"Fonts/{FontName}", ScreenAndMapWidth, ScreenAndMapHeight);
             // Make click-hold a bit snappier; the time between first pressing, and then repeating, should be short.
-            SadConsole.Global.KeyboardState.InitialRepeatDelay = 0.4f; // default of 0.8s was too slow
-
-            this.AddCoreGameLoopSystems();
-            this.container.AddEntity(this.player);
+            SadConsole.Global.KeyboardState.InitialRepeatDelay = 0.4f; // default of 0.8s was too slow            
         }
 
         public void Init()
@@ -63,6 +59,9 @@ namespace EscapeToEarth {
             // Initialize the windows
             Global.CurrentScreen.Children.Add(mainConsole);
 
+            this.AddCoreGameLoopSystems();
+            this.container.AddEntity(this.player);
+
             var isWalkableMap = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
             CellularAutomataGenerator.Generate(isWalkableMap);
 
@@ -80,9 +79,7 @@ namespace EscapeToEarth {
                 map[tile.X, tile.Y] = new MapTile() { IsWalkable = isWalkableMap[tile.X, tile.Y] };
             }
 
-            EventBus.Instance.Register("Player moved", (data) => { this.redrawScreen = true; });
-
-            this.DrawMap();
+            this.container.DrawFrame(0); // Initial draw without player moving
         }
 
         public void Update(GameTime time)
@@ -95,68 +92,13 @@ namespace EscapeToEarth {
 
         public void DrawFrame(GameTime time)
         {
-            this.DrawMap();
-        }
-
-        private void DrawMap()
-        {
-            // TODO: draw only what changed
-            if (this.redrawScreen)
-            {
-                this.DrawAllWallsAndFloors();
-                this.LightenFov();
-                this.DrawCharacter(player.Position.X, player.Position.Y, '@', Color.White);
-
-                this.redrawScreen = false;
-            }
-        }
-
-        private void DrawAllWallsAndFloors()
-        {
-            for (var y = 0; y < ScreenAndMapHeight; y++)
-            {
-                for (var x = 0; x < ScreenAndMapWidth; x++)
-                {
-                    // Draw even if black; because FOV just lightens.
-                    // If we don't draw black tiles, we need FOV to draw it, and we need to mark all
-                    // the FOV tiles as discovered before we draw here.
-                    var colour = map[x, y].IsDiscovered ? this.Grey48 : Color.Black;
-                    this.DrawCharacter(x, y, map[x, y].IsWalkable == false ? '#' : '.', colour);
-                }
-            }
-        }
-
-        private void DrawCharacter(int x, int y, int character, Color? colour = null)
-        {
-            if (colour.HasValue)
-            {
-                mainConsole.SetForeground(x, y, colour.Value);
-            }
-
-            mainConsole.SetGlyph(x, y, character);
-        }
-
-        private void LightenFov()
-        {
-            // Assumption: previously-lit tiles are dark now
-            // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)
-            for (int y = player.Position.Y - Player.FovRadius; y < player.Position.Y + Player.FovRadius; y++)
-            {
-                for (int x = player.Position.X - Player.FovRadius; x < player.Position.X + Player.FovRadius; x++)
-                {
-                    if ((x >= 0 && x < ScreenAndMapWidth && y >= 0 && y < ScreenAndMapHeight) &&
-                    (Math.Pow(x - player.Position.X, 2) + Math.Pow(y - player.Position.Y, 2) <= 2 * Player.FovRadius))
-                    {
-                        map[x, y].IsDiscovered = true;
-                        mainConsole.SetForeground(x, y, Color.DarkGray);
-                    }
-                }
-            }
+            this.container.DrawFrame(time.ElapsedGameTime.TotalSeconds);
         }
 
         private void AddCoreGameLoopSystems()
         {
             this.container.AddSystem(new MovementSystem(this.player));
+            this.container.AddSystem(new DrawingSystem(this.player, this.mainConsole));
         }
     }
 }
