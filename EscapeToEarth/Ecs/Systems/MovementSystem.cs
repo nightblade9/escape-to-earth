@@ -12,7 +12,7 @@ namespace EscapeToEarth.Ecs.Systems
     {
         private ArrayMap<MapTile> map;
 
-        public MovementSystem(Player player) : base(player)
+        public MovementSystem(Entity player) : base(player)
         {
             EventBus.Instance.Register("Map changed", (map) => this.map = map as ArrayMap<MapTile>);
         }

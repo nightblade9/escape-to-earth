@@ -25,9 +25,9 @@ namespace EscapeToEarth.UnitTest.Ecs.Systems
         public void UpdateChangesPlayerPositionIfNewPositionIsWalkable(bool isDestinationWalkable)
         {
             // Arrange
-            var system = new MovementSystem();
-
             var player = new Entity();
+            var system = new MovementSystem(player);
+
             player.Set(new MoveToKeyboardComponent(player));
             player.Position.X = 3;
             system.Add(player);
