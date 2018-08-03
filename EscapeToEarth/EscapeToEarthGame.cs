@@ -62,22 +62,21 @@ namespace EscapeToEarth
             this.AddCoreGameLoopSystems();
             this.container.AddEntity(this.player);
 
-            var isWalkableMap = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
-            CellularAutomataGenerator.Generate(isWalkableMap);
-
-            // Randomly positioned on a ground tile! True = walkable
-            var playerPosition = isWalkableMap.RandomPosition(true);
-            player.Position.X = playerPosition.X;
-            player.Position.Y = playerPosition.Y;
+            var mapData = this.GenerateMap();
+            var isWalkableMap = mapData.Map;
 
             map = new ArrayMap<MapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
             EventBus.Instance.Broadcast("Map changed", map);
 
+            // Convert ArrayMap<Bool> to ArrayMap<MapTile>
             foreach (var tile in isWalkableMap.Positions())
             {
                 // Convert from boolean (true/false) to tiles
                 map[tile.X, tile.Y] = new MapTile() { IsWalkable = isWalkableMap[tile.X, tile.Y] };
             }
+
+            player.Position.X = mapData.PlayerPosition.X;
+            player.Position.Y = mapData.PlayerPosition.Y;
 
             this.container.DrawFrame(0); // Initial draw without player moving
         }
@@ -99,6 +98,26 @@ namespace EscapeToEarth
         {
             this.container.AddSystem(new MovementSystem(this.player));
             this.container.AddSystem(new DrawingSystem(this.player, this.mainConsole));
+        }
+
+        // TODO: move to a map generator class
+        private MapData GenerateMap()
+        {
+            var isWalkableMap = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
+            CellularAutomataGenerator.Generate(isWalkableMap);
+
+            // Randomly positioned on a ground tile! True = walkable
+            var playerPosition = isWalkableMap.RandomPosition(true);
+            return new MapData() { Map = isWalkableMap, PlayerPosition = playerPosition };
+        }
+
+        private class MapData
+        {
+            public ArrayMap<bool> Map { get; set; }
+
+            // Player position AND stairs-down position
+            public GoRogue.Coord PlayerPosition { get; set; }
+            public GoRogue.Coord StairsDownPosition { get; set; }
         }
     }
 }
