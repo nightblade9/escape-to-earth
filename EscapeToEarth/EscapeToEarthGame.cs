@@ -78,6 +78,11 @@ namespace EscapeToEarth
             player.Position.X = mapData.PlayerPosition.X;
             player.Position.Y = mapData.PlayerPosition.Y;
 
+            
+            var stairsDown = new Entity();
+            stairsDown.Set(new DisplayComponent(stairsDown, '>', Color.White));
+            this.container.AddEntity(stairsDown);
+
             this.container.DrawFrame(0); // Initial draw without player moving
         }
 
@@ -103,12 +108,21 @@ namespace EscapeToEarth
         // TODO: move to a map generator class
         private MapData GenerateMap()
         {
+            const int MinimumPlayerStairsDistance = 5;
+
             var isWalkableMap = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
             CellularAutomataGenerator.Generate(isWalkableMap);
 
             // Randomly positioned on a ground tile! True = walkable
             var playerPosition = isWalkableMap.RandomPosition(true);
-            return new MapData() { Map = isWalkableMap, PlayerPosition = playerPosition };
+
+            var stairsDownPosition = playerPosition;
+            while (Math.Abs(playerPosition.X - stairsDownPosition.X) + Math.Abs(playerPosition.Y - stairsDownPosition.Y) <= MinimumPlayerStairsDistance)
+            {
+                stairsDownPosition = isWalkableMap.RandomPosition(true);
+            }
+
+            return new MapData() { Map = isWalkableMap, PlayerPosition = playerPosition, StairsDownPosition = stairsDownPosition };
         }
 
         private class MapData
