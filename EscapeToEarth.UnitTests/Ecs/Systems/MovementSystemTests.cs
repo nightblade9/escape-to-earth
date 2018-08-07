@@ -1,7 +1,7 @@
 using EscapeToEarth.Ecs;
 using EscapeToEarth.Ecs.Components;
 using EscapeToEarth.Ecs.Systems;
-using EscapeToEarth.Entities;
+using EscapeToEarth.Entities.MapTiles;
 using GoRogue;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework.Input;
@@ -35,12 +35,12 @@ namespace EscapeToEarth.UnitTest.Ecs.Systems
             
             var playerMoved = false;
 
-            var map = new ArrayMap<MapTile>(5, 5);
+            var map = new ArrayMap<AbstractMapTile>(5, 5);
             for (var y = 0; y < map.Height; y++)
             {
                 for (var x = 0; x < map.Width; x++)
                 {
-                    map[x, y] = new MapTile() { IsWalkable = true };
+                    map[x, y] = new FloorTile();
                 }
             }
 

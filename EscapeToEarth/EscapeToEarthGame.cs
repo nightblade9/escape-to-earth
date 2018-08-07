@@ -2,6 +2,7 @@ using EscapeToEarth.Ecs;
 using EscapeToEarth.Ecs.Components;
 using EscapeToEarth.Ecs.Systems;
 using EscapeToEarth.Entities;
+using EscapeToEarth.Entities.MapTiles;
 using GoRogue.MapGeneration.Generators;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
@@ -23,7 +24,7 @@ namespace EscapeToEarth
 
         private Container container = new Container();
 
-        private ArrayMap<MapTile> map;
+        private ArrayMap<AbstractMapTile> map;
         private Player player = new Player();
 
         public EscapeToEarthGame()
@@ -65,24 +66,32 @@ namespace EscapeToEarth
             var mapData = this.GenerateMap();
             var isWalkableMap = mapData.Map;
 
-            map = new ArrayMap<MapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
+            map = new ArrayMap<AbstractMapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
             EventBus.Instance.Broadcast("Map changed", map);
 
             // Convert ArrayMap<Bool> to ArrayMap<MapTile>
             foreach (var tile in isWalkableMap.Positions())
             {
+                AbstractMapTile mapTile;
+
                 // Convert from boolean (true/false) to tiles
-                map[tile.X, tile.Y] = new MapTile() { IsWalkable = isWalkableMap[tile.X, tile.Y] };
+                if (isWalkableMap[tile.X, tile.Y])
+                {
+                    mapTile = new FloorTile();
+                }
+                else
+                {
+                    mapTile = new WallTile();
+                }
+
+                map[tile.X, tile.Y] = mapTile;
             }
 
             player.Position.X = mapData.PlayerPosition.X;
             player.Position.Y = mapData.PlayerPosition.Y;
 
+            map[mapData.StairsDownPosition.X, mapData.StairsDownPosition.Y] = new StairsDownTile();
             
-            var stairsDown = new Entity(mapData.StairsDownPosition.X, mapData.StairsDownPosition.Y);
-            stairsDown.Set(new DisplayComponent(stairsDown, '>', Color.White));
-            this.container.AddEntity(stairsDown);
-
             this.container.DrawFrame(0); // Initial draw without player moving
         }
 

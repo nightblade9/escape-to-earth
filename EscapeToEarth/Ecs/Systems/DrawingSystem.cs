@@ -1,6 +1,7 @@
 using EscapeToEarth.Ecs;
 using EscapeToEarth.Ecs.Components;
 using EscapeToEarth.Entities;
+using EscapeToEarth.Entities.MapTiles;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -18,14 +19,14 @@ namespace EscapeToEarth.Ecs.Systems
         private readonly SadConsole.Console mainConsole;
         private List<Tuple<int, int>> previousFovTiles = new List<Tuple<int, int>>();
 
-        private ArrayMap<MapTile> map;
+        private ArrayMap<AbstractMapTile> map;
         private bool redrawScreen = true;
 
         public DrawingSystem(Entity player, SadConsole.Console mainConsole) : base(player)
         {
             this.mainConsole = mainConsole;
 
-            EventBus.Instance.Register("Map changed", (map) => this.map = map as ArrayMap<MapTile>);
+            EventBus.Instance.Register("Map changed", (map) => this.map = map as ArrayMap<AbstractMapTile>);
             EventBus.Instance.Register("Player moved", (data) => { this.redrawScreen = true; });
         }
 
@@ -51,14 +52,6 @@ namespace EscapeToEarth.Ecs.Systems
             // TODO: draw only what changed
             if (this.redrawScreen)
             {
-                /////////
-                // This is incorrect. To get stairs to show in fog, we just darken/lighten the FOV.
-                // If a tile has, say, an item, or a monster, we should actually redraw over it as dungeon floor.
-                // We need to revisit/fix this later. You can make a case for just darkening FOV if the only thing
-                // there is an item, but certainly, for monsters, we should "undo" and draw the floor tile under
-                // them whenever they move.
-                /////////
-                
                 this.DarkenFov(this.previousFovTiles);
 
                 var fovTiles = this.CalculateFieldOfView();
@@ -95,7 +88,7 @@ namespace EscapeToEarth.Ecs.Systems
                 // If we don't draw black tiles, we need FOV to draw it, and we need to mark all
                 // the FOV tiles as discovered before we draw here.
                 var colour = map[x, y].IsDiscovered ? this.Grey48 : Color.Black;
-                this.DrawCharacter(x, y, map[x, y].IsWalkable == false ? '#' : '.', colour);
+                this.DrawCharacter(x, y, map[x, y].FloorCharacter);
             }
         }
 
@@ -130,7 +123,6 @@ namespace EscapeToEarth.Ecs.Systems
 
         private void LightenFov(List<Tuple<int, int>> fovTiles)
         {
-            // Assumption: previously-lit tiles are dark now
             // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)
             foreach (var tile in fovTiles)
             {
@@ -143,7 +135,9 @@ namespace EscapeToEarth.Ecs.Systems
 
         private void DarkenFov(List<Tuple<int, int>> fovTiles)
         {
-            // Assumption: previously-lit tiles are dark now
+            // TODO: we can make this more efficient by passing in the previous FOV, subtracting the current FOV
+            // If this becomes a bottleneck with large FOVs, that might be a good performance optimization.
+
             // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)
             foreach (var tile in fovTiles)
             {

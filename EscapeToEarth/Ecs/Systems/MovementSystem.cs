@@ -1,6 +1,6 @@
 using EscapeToEarth.Ecs;
 using EscapeToEarth.Ecs.Components;
-using EscapeToEarth.Entities;
+using EscapeToEarth.Entities.MapTiles;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework.Input;
 using SadConsole.Input;
@@ -10,11 +10,11 @@ namespace EscapeToEarth.Ecs.Systems
 {
     public class MovementSystem : AbstractSystem
     {
-        private ArrayMap<MapTile> map;
+        private ArrayMap<AbstractMapTile> map;
 
         public MovementSystem(Entity player) : base(player)
         {
-            EventBus.Instance.Register("Map changed", (map) => this.map = map as ArrayMap<MapTile>);
+            EventBus.Instance.Register("Map changed", (map) => this.map = map as ArrayMap<AbstractMapTile>);
         }
 
         override public void Add(Entity e)
