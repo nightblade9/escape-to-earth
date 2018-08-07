@@ -79,7 +79,7 @@ namespace EscapeToEarth
             player.Position.Y = mapData.PlayerPosition.Y;
 
             
-            var stairsDown = new Entity();
+            var stairsDown = new Entity(mapData.StairsDownPosition.X, mapData.StairsDownPosition.Y);
             stairsDown.Set(new DisplayComponent(stairsDown, '>', Color.White));
             this.container.AddEntity(stairsDown);
 
@@ -121,6 +121,8 @@ namespace EscapeToEarth
             {
                 stairsDownPosition = isWalkableMap.RandomPosition(true);
             }
+
+            System.Console.WriteLine($"Player is at {playerPosition.X}, {playerPosition.Y} and stairs are at {stairsDownPosition.X}, {stairsDownPosition.Y}");
 
             return new MapData() { Map = isWalkableMap, PlayerPosition = playerPosition, StairsDownPosition = stairsDownPosition };
         }

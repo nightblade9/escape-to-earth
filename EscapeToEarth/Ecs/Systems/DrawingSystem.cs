@@ -8,6 +8,7 @@ using SadConsole;
 using SadConsole.Input;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EscapeToEarth.Ecs.Systems
 {
@@ -50,7 +51,19 @@ namespace EscapeToEarth.Ecs.Systems
             if (this.redrawScreen)
             {
                 this.DrawAllWallsAndFloors();
-                this.LightenFov();
+                var fovTiles = this.CalculateFieldOfView();
+
+                this.LightenFov(fovTiles);
+
+                foreach (var entity in this.entities)
+                {
+                    var display = entity.Get<DisplayComponent>();
+                    if (fovTiles.Any(t => t.Item1 == entity.Position.X && t.Item2 == entity.Position.Y))
+                    {
+                        this.DrawCharacter(entity.Position.X, entity.Position.Y, display.Character, display.Colour);
+                    }
+                }
+
                 var playerDisplay = this.player.Get<DisplayComponent>();
                 this.DrawCharacter(player.Position.X, player.Position.Y, playerDisplay.Character, playerDisplay.Colour);
 
@@ -83,10 +96,10 @@ namespace EscapeToEarth.Ecs.Systems
             mainConsole.SetGlyph(x, y, character);
         }
 
-        private void LightenFov()
+        private List<Tuple<int, int>> CalculateFieldOfView()
         {
-            // Assumption: previously-lit tiles are dark now
-            // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)
+            var toReturn = new List<Tuple<int, int>>();
+
             for (int y = player.Position.Y - Player.FovRadius; y < player.Position.Y + Player.FovRadius; y++)
             {
                 for (int x = player.Position.X - Player.FovRadius; x < player.Position.X + Player.FovRadius; x++)
@@ -94,10 +107,24 @@ namespace EscapeToEarth.Ecs.Systems
                     if ((x >= 0 && x < this.mainConsole.Width && y >= 0 && y < this.mainConsole.Height) &&
                     (Math.Pow(x - player.Position.X, 2) + Math.Pow(y - player.Position.Y, 2) <= 2 * Player.FovRadius))
                     {
-                        map[x, y].IsDiscovered = true;
-                        mainConsole.SetForeground(x, y, Color.DarkGray);
+                        toReturn.Add(new Tuple<int, int>(x, y));
                     }
                 }
+            }
+
+            return toReturn;
+        }
+
+        private void LightenFov(List<Tuple<int, int>> fovTiles)
+        {
+            // Assumption: previously-lit tiles are dark now
+            // Assumption: tiles don't use colour to convey information. Redraw all entities (lava, monsters, etc.)
+            foreach (var tile in fovTiles)
+            {
+                var x = tile.Item1;
+                var y = tile.Item2;
+                map[x, y].IsDiscovered = true;
+                mainConsole.SetForeground(x, y, Color.DarkGray);
             }
         }
     }

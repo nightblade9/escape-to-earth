@@ -16,6 +16,12 @@ namespace EscapeToEarth.Ecs
             this.Position = new PositionComponent(this);
         }
 
+        public Entity(int x, int y) : this()
+        {
+            this.Position.X = x;
+            this.Position.Y = y;
+        }
+
         public bool Has<T>() where T : BaseComponent
         {
             return this.Get<T>() != default(T);
