@@ -122,8 +122,6 @@ namespace EscapeToEarth
                 stairsDownPosition = isWalkableMap.RandomPosition(true);
             }
 
-            System.Console.WriteLine($"Player is at {playerPosition.X}, {playerPosition.Y} and stairs are at {stairsDownPosition.X}, {stairsDownPosition.Y}");
-
             return new MapData() { Map = isWalkableMap, PlayerPosition = playerPosition, StairsDownPosition = stairsDownPosition };
         }
 
