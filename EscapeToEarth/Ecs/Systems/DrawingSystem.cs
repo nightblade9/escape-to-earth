@@ -26,8 +26,8 @@ namespace EscapeToEarth.Ecs.Systems
         {
             this.mainConsole = mainConsole;
 
-            EventBus.Instance.Register("Map changed", (map) => this.map = map as ArrayMap<AbstractMapTile>);
-            EventBus.Instance.Register("Player moved", (data) => { this.redrawScreen = true; });
+            EventBus.Instance.Register<ArrayMap<AbstractMapTile>>("Map changed", (map) => this.map = map);
+            EventBus.Instance.Register<Player>("Player moved", (data) => { this.redrawScreen = true; });
         }
 
         override public void Add(Entity e)

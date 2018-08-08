@@ -14,7 +14,7 @@ namespace EscapeToEarth.Ecs.Systems
 
         public MovementSystem(Entity player) : base(player)
         {
-            EventBus.Instance.Register("Map changed", (map) => this.map = map as ArrayMap<AbstractMapTile>);
+            EventBus.Instance.Register<ArrayMap<AbstractMapTile>>("Map changed", (map) => this.map = map);
         }
 
         override public void Add(Entity e)
