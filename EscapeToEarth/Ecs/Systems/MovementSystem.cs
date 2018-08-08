@@ -52,7 +52,8 @@ namespace EscapeToEarth.Ecs.Systems
             if (IsShiftKeyDown(keysDown) && keysDown.Any(k => k.Key == Keys.OemPeriod) &&
             this.map[this.player.Position.X, this.player.Position.Y] is StairsDownTile)
             {
-                System.Console.WriteLine("DSECEND!!!!");
+                // TODO: un-hardcode the new current floor
+                EventBus.Instance.Broadcast("Player used stairs", "1F");
             }
 
             if (keysPressed.Contains(AsciiKey.Get(Keys.Escape)))

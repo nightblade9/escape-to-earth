@@ -40,6 +40,8 @@ namespace EscapeToEarth
             SadConsole.Game.Create($"Fonts/{FontName}", ScreenAndMapWidth, ScreenAndMapHeight);
             // Make click-hold a bit snappier; the time between first pressing, and then repeating, should be short.
             SadConsole.Global.KeyboardState.InitialRepeatDelay = 0.4f; // default of 0.8s was too slow            
+
+            EventBus.Instance.Register<String>("Player used stairs", (newFloor) => this.GenerateMap(newFloor));
         }
 
         public void Init()
@@ -62,37 +64,7 @@ namespace EscapeToEarth
 
             this.AddCoreGameLoopSystems();
             this.container.AddEntity(this.player);
-
-            var mapData = this.GenerateMap();
-            var isWalkableMap = mapData.Map;
-
-            map = new ArrayMap<AbstractMapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
-            EventBus.Instance.Broadcast("Map changed", map);
-
-            // Convert ArrayMap<Bool> to ArrayMap<MapTile>
-            foreach (var tile in isWalkableMap.Positions())
-            {
-                AbstractMapTile mapTile;
-
-                // Convert from boolean (true/false) to tiles
-                if (isWalkableMap[tile.X, tile.Y])
-                {
-                    mapTile = new FloorTile();
-                }
-                else
-                {
-                    mapTile = new WallTile();
-                }
-
-                map[tile.X, tile.Y] = mapTile;
-            }
-
-            player.Position.X = mapData.PlayerPosition.X;
-            player.Position.Y = mapData.PlayerPosition.Y;
-
-            map[mapData.StairsDownPosition.X, mapData.StairsDownPosition.Y] = new StairsDownTile();
-            
-            this.container.DrawFrame(0); // Initial draw without player moving
+            this.GenerateMap("1F");
         }
 
         public void Update(GameTime time)
@@ -115,8 +87,10 @@ namespace EscapeToEarth
         }
 
         // TODO: move to a map generator class
-        private MapData GenerateMap()
+        // Floor name is something like 1F, etc.
+        private void GenerateMap(string floorName)
         {
+            // Generate a walkable map, complete with stairs down
             const int MinimumPlayerStairsDistance = 5;
 
             var isWalkableMap = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
@@ -131,7 +105,37 @@ namespace EscapeToEarth
                 stairsDownPosition = isWalkableMap.RandomPosition(true);
             }
 
-            return new MapData() { Map = isWalkableMap, PlayerPosition = playerPosition, StairsDownPosition = stairsDownPosition };
+            System.Console.WriteLine($"Stairs are at {stairsDownPosition}");
+            var mapData = new MapData() { Map = isWalkableMap, PlayerPosition = playerPosition, StairsDownPosition = stairsDownPosition };
+
+            map = new ArrayMap<AbstractMapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
+            EventBus.Instance.Broadcast("Map changed", map);
+
+            // Convert ArrayMap<Bool> to ArrayMap<MapTile>
+            foreach (var tile in isWalkableMap.Positions())
+            {
+                AbstractMapTile mapTile;
+
+                // Convert from boolean (true/false) to tiles
+                if (isWalkableMap[tile.X, tile.Y])
+                {
+                    mapTile = new FloorTile();
+                }
+                else
+                {
+                    mapTile = new WallTile();
+                }
+
+                map[tile.X, tile.Y] = mapTile;
+            }
+
+            // Position player and stairs
+            player.Position.X = mapData.PlayerPosition.X;
+            player.Position.Y = mapData.PlayerPosition.Y;
+
+            map[mapData.StairsDownPosition.X, mapData.StairsDownPosition.Y] = new StairsDownTile();
+
+            this.container.DrawFrame(0); // Initial draw without player moving
         }
 
         private class MapData

@@ -27,7 +27,13 @@ namespace EscapeToEarth.Ecs.Systems
             this.mainConsole = mainConsole;
 
             EventBus.Instance.Register<ArrayMap<AbstractMapTile>>("Map changed", (map) => this.map = map);
-            EventBus.Instance.Register<Player>("Player moved", (data) => { this.redrawScreen = true; });
+            EventBus.Instance.Register<Player>("Player moved", (data) => this.redrawScreen = true );
+            EventBus.Instance.Register<Player>("Player used stairs", (p) => {
+                this.mainConsole.Clear();
+                this.previousFovTiles.Clear();
+                this.redrawScreen = true;
+                this.DrawAll();
+            });
         }
 
         override public void Add(Entity e)
