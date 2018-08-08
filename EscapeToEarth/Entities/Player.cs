@@ -15,6 +15,9 @@ namespace EscapeToEarth.Entities
         {
             this.Set(new MoveToKeyboardComponent(this));
             this.Set(new DisplayComponent(this, '@', Color.White));
+
+            // Do not check in
+            EventBus.Instance.Register<Player>("Player moved", (player) => System.Console.WriteLine($"Player is at {player.Position.X}, {player.Position.Y}"));
         }
     }
 }

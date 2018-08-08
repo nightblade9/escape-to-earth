@@ -4,6 +4,8 @@ using EscapeToEarth.Entities.MapTiles;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework.Input;
 using SadConsole.Input;
+using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace EscapeToEarth.Ecs.Systems
@@ -27,12 +29,13 @@ namespace EscapeToEarth.Ecs.Systems
 
         override public void Update(double elapsedSeconds)
         {
-            var keysDown = SadConsole.Global.KeyboardState.KeysPressed;
+            var keysPressed = SadConsole.Global.KeyboardState.KeysPressed;
+            var keysDown = SadConsole.Global.KeyboardState.KeysDown;
 
             var oldPlayerX = this.player.Position.X;
             var oldPlayerY = this.player.Position.Y;
 
-            this.player.Get<MoveToKeyboardComponent>().Update(keysDown);
+            this.player.Get<MoveToKeyboardComponent>().Update(keysPressed);
 
             // Glorious hack. TODO: query the map tile for this + list of blocking objects
             if (!this.map[this.player.Position.X, this.player.Position.Y].IsWalkable)
@@ -46,10 +49,21 @@ namespace EscapeToEarth.Ecs.Systems
                 EventBus.Instance.Broadcast("Player moved", player);
             }
 
-            if (keysDown.Contains(AsciiKey.Get(Keys.Escape)))
+            if (IsShiftKeyDown(keysDown) && keysDown.Any(k => k.Key == Keys.OemPeriod) &&
+            this.map[this.player.Position.X, this.player.Position.Y] is StairsDownTile)
+            {
+                System.Console.WriteLine("DSECEND!!!!");
+            }
+
+            if (keysPressed.Contains(AsciiKey.Get(Keys.Escape)))
             {
                 System.Environment.Exit(0);
             }
+        }
+
+        private bool IsShiftKeyDown(List<AsciiKey> keysDown)
+        {
+            return keysDown.Contains(AsciiKey.Get(Keys.LeftShift)) || keysDown.Contains(AsciiKey.Get(Keys.RightShift));
         }
     }
 }
