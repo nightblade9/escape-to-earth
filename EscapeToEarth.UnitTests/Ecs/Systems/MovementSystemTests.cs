@@ -1,6 +1,7 @@
 using EscapeToEarth.Ecs;
 using EscapeToEarth.Ecs.Components;
 using EscapeToEarth.Ecs.Systems;
+using EscapeToEarth.Entities;
 using EscapeToEarth.Entities.MapTiles;
 using GoRogue;
 using GoRogue.MapViews;
@@ -49,7 +50,7 @@ namespace EscapeToEarth.UnitTest.Ecs.Systems
 
             // Update the map in the movement system
             EventBus.Instance.Broadcast("Map changed", map);
-            EventBus.Instance.Register("Player moved", (data) => playerMoved = true);
+            EventBus.Instance.Register<Player>("Player moved", (data) => playerMoved = true);
 
             var expectedX = isDestinationWalkable ? player.Position.X - 1 : player.Position.X;
 

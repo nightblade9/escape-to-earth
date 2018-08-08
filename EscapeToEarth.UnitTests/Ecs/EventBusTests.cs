@@ -1,5 +1,6 @@
 using EscapeToEarth.Ecs;
 using NUnit.Framework;
+using System;
 
 namespace EscapeToEarth.UnitTest.Ecs
 {
@@ -11,18 +12,18 @@ namespace EscapeToEarth.UnitTest.Ecs
         {
             // Arrange
             var bus = new EventBus();
-            var expectedData = new object[] { "hi", 37, -7 };
+            var expectedData = new string[] { "hi", "37", " " };
             var callbacksInvoked = 0;
 
             // Case #1: Multiple handlers for the same event
-            bus.Register("E1", (data) => {
+            bus.Register<string>("E1", (data) => {
                 if (data == expectedData[0])
                 {
                     callbacksInvoked++;
                 }
             });
 
-            bus.Register("E1", (data) => {
+            bus.Register<string>("E1", (data) => {
                 if (data == expectedData[1])
                 {
                     callbacksInvoked++;
@@ -30,7 +31,7 @@ namespace EscapeToEarth.UnitTest.Ecs
             });
 
             // Case #2: a single handler
-            bus.Register("E2", (data) => {
+            bus.Register<string>("E2", (data) => {
                 Assert.That(data, Is.EqualTo(expectedData[2]));
                 callbacksInvoked++;
             });
