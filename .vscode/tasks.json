@@ -10,16 +10,6 @@
                 "${workspaceFolder}/EscapeToEarth/EscapeToEarth.csproj"
             ],
             "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "build",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/EscapeToEarth/EscapeToEarth.csproj"
-            ],
-            "problemMatcher": "$msCompile"
         }
     ]
 }
