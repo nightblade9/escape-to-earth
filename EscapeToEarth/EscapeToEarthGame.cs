@@ -1,9 +1,8 @@
 using EscapeToEarth.Ecs;
-using EscapeToEarth.Ecs.Components;
 using EscapeToEarth.Ecs.Systems;
 using EscapeToEarth.Entities;
 using EscapeToEarth.Entities.MapTiles;
-using GoRogue.MapGeneration.Generators;
+using EscapeToEarth.Generators;
 using GoRogue.MapViews;
 using Microsoft.Xna.Framework;
 using SadConsole;
@@ -24,7 +23,6 @@ namespace EscapeToEarth
 
         private Container container = new Container();
 
-        private ArrayMap<AbstractMapTile> map;
         private Player player = new Player();
 
         public EscapeToEarthGame()
@@ -90,34 +88,18 @@ namespace EscapeToEarth
         // Floor name is something like 1F, etc.
         private void GenerateMap(string floorName)
         {
-            // Generate a walkable map, complete with stairs down
-            const int MinimumPlayerStairsDistance = 5;
+            var mapData = MapGenerator.GenerateFloor(1, ScreenAndMapWidth, ScreenAndMapHeight);
 
-            var isWalkableMap = new ArrayMap<bool>(ScreenAndMapWidth, ScreenAndMapHeight);
-            CellularAutomataGenerator.Generate(isWalkableMap);
-
-            // Randomly positioned on a ground tile! True = walkable
-            var playerPosition = isWalkableMap.RandomPosition(true);
-
-            var stairsDownPosition = playerPosition;
-            while (Math.Abs(playerPosition.X - stairsDownPosition.X) + Math.Abs(playerPosition.Y - stairsDownPosition.Y) <= MinimumPlayerStairsDistance)
-            {
-                stairsDownPosition = isWalkableMap.RandomPosition(true);
-            }
-
-            System.Console.WriteLine($"Stairs are at {stairsDownPosition}");
-            var mapData = new MapData() { Map = isWalkableMap, PlayerPosition = playerPosition, StairsDownPosition = stairsDownPosition };
-
-            map = new ArrayMap<AbstractMapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
-            EventBus.Instance.Broadcast("Map changed", map);
+            // Apply changes to our map
+            var map = new ArrayMap<AbstractMapTile>(ScreenAndMapWidth, ScreenAndMapHeight);
 
             // Convert ArrayMap<Bool> to ArrayMap<MapTile>
-            foreach (var tile in isWalkableMap.Positions())
+            foreach (var tile in mapData.Map.Positions())
             {
                 AbstractMapTile mapTile;
 
                 // Convert from boolean (true/false) to tiles
-                if (isWalkableMap[tile.X, tile.Y])
+                if (mapData.Map[tile.X, tile.Y])
                 {
                     mapTile = new FloorTile();
                 }
@@ -135,16 +117,9 @@ namespace EscapeToEarth
 
             map[mapData.StairsDownPosition.X, mapData.StairsDownPosition.Y] = new StairsDownTile();
 
+            EventBus.Instance.Broadcast("Map changed", map);
+
             this.container.DrawFrame(0); // Initial draw without player moving
-        }
-
-        private class MapData
-        {
-            public ArrayMap<bool> Map { get; set; }
-
-            // Player position AND stairs-down position
-            public GoRogue.Coord PlayerPosition { get; set; }
-            public GoRogue.Coord StairsDownPosition { get; set; }
         }
     }
 }
