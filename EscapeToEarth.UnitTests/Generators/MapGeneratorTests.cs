@@ -13,15 +13,17 @@ namespace EscapeToEarth.UnitTest.Generators
     [TestFixture]
     public class MapGeneratorTests
     {
-        [Ignore("Test passes most of the time, but sometimes freezes. Timeout doesn't unfreeze it.")]
         [Test]
+        // This test occassionally takes >= 10 seconds. That's okay. It's not flaky this way.
         public void GenerateFloorGeneratesMapWithWalkablePathFromPlayerToStairsAndStairsIsSufficientlyFarAway()
         {
             // Generate map
             // Get the player and stairs position
             // Path-find (BFS) and make sure we can reach
             // verify the distance is large enough
-            var mapData = MapGenerator.GenerateFloor(1, 10, 10);
+
+            // CRITICAL: make sure the map is big enough to position the player far from stairs.
+            var mapData = MapGenerator.GenerateFloor(1, 20, 20);
 
             var map = mapData.Map;
             var playerPosition = mapData.PlayerPosition;
@@ -53,6 +55,9 @@ namespace EscapeToEarth.UnitTest.Generators
             }
 
             Assert.That(currentPosition, Is.EqualTo(stairsDownPosition), "Couldn't find a way from current position to stairs");
+
+            var playerToStairsDistance = Math.Abs(playerPosition.X - stairsDownPosition.X) + Math.Abs(playerPosition.Y - stairsDownPosition.Y);
+            Assert.That(playerToStairsDistance, Is.GreaterThanOrEqualTo(MapGenerator.MinimumPlayerStairsDistance));
         }
 
         public void AddIfWalkableAndNeverChecked(ArrayMap<bool> map, int x, int y,  List<Coord> exploredPositions,  List<Coord> positionsToExplore)
