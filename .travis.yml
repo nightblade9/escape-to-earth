@@ -3,5 +3,5 @@ solution: escape-to-earth.sln
 mono: none
 dotnet: 2.1.300
 script:
-  cd EscapeToEarth.UnitTests
-  dotnet test
+  - cd EscapeToEarth.UnitTests
+  - dotnet test
