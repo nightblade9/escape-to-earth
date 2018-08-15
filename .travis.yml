@@ -1,0 +1,7 @@
+language: csharp
+solution: escape-to-earth.sln
+mono: none
+dotnet: 2.2.200
+script:
+  cd EscapeToEarth.UnitTests
+  dotnet test
