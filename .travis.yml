@@ -8,7 +8,7 @@ before_install:
   - unzip MonoGame.Linux.zip
   - find * -type f -exec chmod 777 {} \; # lazy just make all executable
 install:
-  - sudo apt-get install -qq monodevelop libopenal-dev referenceassemblies-pcl ttf-mscorefonts-installer gtk-sharp2; # install needed packages for the monogame sdk
+  - sudo apt-get install -qq monodevelop libopenal-dev ttf-mscorefonts-installer gtk-sharp2; # install needed packages for the monogame sdk
   - sudo ./generate.sh && yes Y|sudo ./monogame-linux.run; # install monogame sdk
 script:
   - cd EscapeToEarth.UnitTests
