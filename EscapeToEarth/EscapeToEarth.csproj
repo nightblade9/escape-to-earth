@@ -5,12 +5,9 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
-  <!-- Doesn't seem to be needed and breaks the Travis-CI build.
-  See: https://github.com/Thraka/SadConsole/issues/142#issuecomment-413638001
-  
   <ItemGroup>
     <MonoGameContentReference Include="**\*.mgcb" />
-  </ItemGroup> -->
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="Fonts\IBM.font" CopyToOutputDirectory="PreserveNewest" />
