@@ -1,5 +1,7 @@
 # Escape To Earth
 
+[![Build Status](https://travis-ci.org/nightblade9/escape-to-earth.svg?branch=master)](https://travis-ci.org/nightblade9/escape-to-earth)
+
 Stealth rescue roguelite where you team up with others to escape to earth. Made with .NET Core, SadConsole, and GoRogue.
 
 ## Design Goals
