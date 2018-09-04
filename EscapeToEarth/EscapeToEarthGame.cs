@@ -53,7 +53,7 @@ namespace EscapeToEarth
             //Global.MouseState.ProcessMouseWhenOffScreen = true;
 
             // We'll instead use our demo consoles that show various features of SadConsole.
-            Global.CurrentScreen = new SadConsole.Screen();
+            Global.CurrentScreen = new SadConsole.ScreenObject();
 
             mainConsole = new SadConsole.Console(ScreenAndMapWidth, ScreenAndMapHeight);    
 
